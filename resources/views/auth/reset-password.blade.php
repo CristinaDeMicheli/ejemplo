@@ -1,10 +1,10 @@
 @extends('layouts.auth_app')
 @section('title')
-    Reset Password
+    Restablecer Contraseña
 @endsection
 @section('content')
     <div class="card card-primary">
-        <div class="card-header"><h4>Set a New Password</h4></div>
+        <div class="card-header"><h4>Establecer una nueva contraseña</h4></div>
 
         <div class="card-body">
             <form method="POST" action="{{ url('/password/reset') }}">
@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="password_confirmation" class="control-label">Confirm Password</label>
+                    <label for="password_confirmation" class="control-label">Confirmar Contraseña</label>
                     <input id="password_confirmation" type="password"
                            class="form-control{{ $errors->has('password_confirmation') ? ' is-invalid': '' }}"
                            name="password_confirmation" tabindex="2">
@@ -47,13 +47,13 @@
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
-                        Set a New Password
+                        Establecer una nueva contraseña
                     </button>
                 </div>
             </form>
         </div>
     </div>
     <div class="mt-5 text-muted text-center">
-        Recalled your login info? <a href="{{ route('login') }}">Sign In</a>
+       ¿Recordó su información de inicio de sesión?<a href="{{ route('login') }}">Iniciar sesión</a>
     </div>
 @endsection

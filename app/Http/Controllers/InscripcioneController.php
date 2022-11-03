@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inscripcione;
+use App\Models\User;
+use App\Models\Curso;
+use Illuminate\Support\Facades\DB;
 
 class InscripcioneController extends Controller
 {
      function __construct()
-   {
-    $this->middleware('permission:ver-inscripcione | crear-inscripcione | editar-inscripcione | borrar-inscripcione')->only=>('index');
-    $this->middleware('permission:crear-inscripcione', ['only'=>['create','store']]);
-    $this->middleware('permission: editar-inscripcione', ['only'=>['edit','update']]);
-    $this->middleware('borrar-inscripcione', ['only'=>['destroy']]);
-   }
+  {
+         $this->middleware('permission:ver-inscripcione|crear-inscripcione|editar-inscripcione|borrar-inscripcione', ['only' => ['index']]);
+         $this->middleware('permission:crear-inscripcione', ['only' => ['create','store']]);
+         $this->middleware('permission:editar-inscripcione', ['only' => ['edit','update']]);
+         $this->middleware('permission:borrar-inscripcione', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -23,7 +26,7 @@ class InscripcioneController extends Controller
     {
        //Con paginación
          $inscripciones = Inscripcione::paginate(5);
-         return view('incripciones.index',compact('inscripciones'));
+         return view('inscripciones.index',compact('inscripciones'));
          //al usar esta paginacion, recordar poner en el el index.blade.php este codigo  {!! $blogs->links() !!}
     }
 
@@ -35,7 +38,16 @@ class InscripcioneController extends Controller
     public function create()
     {
         //
-         return view('inscripciones.crear');
+      //  $usuarios = User::pluck('name','name')->all();
+       // $cursos =  Curso::pluck('titulo','titulo')->all();
+       
+            //$usuarios = DB::table('user')->get();
+             //$cursos = DB::table('curso')->get();
+        
+        $cursos = Curso::all();
+         $usuarios = User::all();
+        //$usuarios = User::first();
+         return view('inscripciones.crear',compact('usuarios','cursos'));
     }
 
     /**
@@ -46,8 +58,9 @@ class InscripcioneController extends Controller
      */
     public function store(Request $request)
     {
-         //
-        request()->validate([
+        //dd($request);
+       // exit();
+            request()->validate([
            'user_id'=> 'required',
             'curso_id'=> 'required',
         ]);  
@@ -76,7 +89,10 @@ class InscripcioneController extends Controller
     public function edit($id)
     {
         //
-        return view('inscripciones.editar',compact('inscripcione'));
+         $usuarios = User::all();
+        $cursos =  Curso::all();
+         $inscripcione = Inscripcione::find($id);
+        return view('inscripciones.editar',compact('inscripcione','usuarios','cursos'));
     }
 
     /**
@@ -93,6 +109,10 @@ class InscripcioneController extends Controller
            'user_id'=> 'required',
             'curso_id'=> 'required',
         ]); 
+        $inscripcione = Inscripcione::find($id);
+        $inscripcione->user_id= $request->input('user_id');
+        $inscripcione->curso_id= $request->input('curso_id');
+        $inscripcione->save();
         $inscripcione->update($request->all());
     
         return redirect()->route('inscripciones.index');
@@ -106,9 +126,8 @@ class InscripcioneController extends Controller
      */
     public function destroy($id)
     {
-        //
-          $inscrpcione->delete();
-    
-        return redirect()->route('inscripciones.index');
+        ///
+          DB::table("inscripciones")->where('id',$id)->delete();
+        return redirect()->route('inscripciones.index'); 
     }
 }

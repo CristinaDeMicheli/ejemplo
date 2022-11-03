@@ -4,17 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Curso;
+use Illuminate\Support\Facades\DB;
 
 class CursoController extends Controller
 {
 
    function __construct()
-   {
-    $this->middleware('permission:ver-curso | crear-curso | editar-curso | borrar-curso')->only=>('index');
-    $this->middleware('permission:crear-curso', ['only'=>['create','store']]);
-    $this->middleware('permission: editar-curso', ['only'=>['edit','update']]);
-    $this->middleware('borrar-curso', ['only'=>['destroy']]);
-   }
+    {
+         $this->middleware('permission:ver-curso|crear-curso|editar-curso|borrar-curso', ['only' => ['index']]);
+         $this->middleware('permission:crear-curso', ['only' => ['create','store']]);
+         $this->middleware('permission:editar-curso', ['only' => ['edit','update']]);
+         $this->middleware('permission:borrar-curso', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -78,6 +79,7 @@ class CursoController extends Controller
     public function edit($id)
     {
         //
+         $curso = Curso::find($id);
         return view('cursos.editar',compact('curso'));
     }
 
@@ -93,13 +95,18 @@ class CursoController extends Controller
         //
          request()->validate([
            'titulo'=> 'required', 
-           'descripcion'=> 'required',,
+           'descripcion'=> 'required',
         ]);
     
-        $curso->update($request->all());
-    
+        
+        $cursos = Curso::find($id);
+        $cursos->titulo= $request->input('titulo');
+        $cursos->descripcion= $request->input('descripcion');
+        $cursos->save();
+        $cursos->update($request->all());
         return redirect()->route('cursos.index');
-
+    
+         
     }
 
     /**
@@ -111,8 +118,7 @@ class CursoController extends Controller
     public function destroy($id)
     {
         //
-         $curso->delete();
-    
-        return redirect()->route('cursos.index');
+          DB::table("cursos")->where('id',$id)->delete();
+        return redirect()->route('cursos.index');   
     }
 }

@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Alumno;
+use Illuminate\Support\Facades\DB;
 
 class AlumnoController extends Controller
 {
    
    function __construct()
    {
-    $this->middleware('permission:ver-alumno | crear-alumno | editar-alumno | borrar-alumno')->only=>('index');
-    $this->middleware('permission:crear-alumno', ['only'=>['create','store']]);
-    $this->middleware('permission: editar-alumno', ['only'=>['edit','update']]);
-    $this->middleware('borrar-alumno', ['only'=>['destroy']]);
+     $this->middleware('permission:ver-alumno|crear-alumno|editar-alumno|borrar-alumno', ['only' => ['index']]);
+    $this->middleware('permission:crear-alumno', ['only' => ['create','store']]);
+         $this->middleware('permission:editar-alumno', ['only' => ['edit','update']]);
+         $this->middleware('permission:borrar-alumno', ['only' => ['destroy']]);
    }
     
      /**
@@ -48,17 +49,19 @@ class AlumnoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
         request()->validate([
-            'dni'=> 'required', 
+            'dni'=> 'required|unique:alumnos,dni', 
             'apellidoynombre'=> 'required',
-            'matricula'=> 'required',
+            'matricula'=> 'required|unique:alumnos,matricula', 
             'matricula2'=> 'required',
-            'correo'=> 'required',
-            'numerocontacto'=> 'required',
-            'comprobantepago'=> 'required',
-        ]);  
+            'correo'=> 'required|email|unique:alumnos,correo',
+            'contacto'=> 'required',
+            'file'=> 'required|image|mimes:jpeg,png,jpg,|max:10240',
+        ]);
+        dd($request->all());
         Alumno::create($request->all());
+        $request->file('file')->store();
     
         return redirect()->route('alumnos.index');
 
@@ -83,8 +86,9 @@ class AlumnoController extends Controller
      */
     public function edit($id)
     {
-            $alumno = Alumno::find($id);
-            dd($alumno);
+           // $alumno = Alumno::find($id);
+            //dd($alumno);
+           $alumno = Alumno::find($id);
           return view('alumnos.editar',compact('alumno'));
 
     }
@@ -98,7 +102,7 @@ class AlumnoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        //agregar validar imagen
          request()->validate([
            'dni'=> 'required', 
             'apellidoynombre'=> 'required',
@@ -106,9 +110,17 @@ class AlumnoController extends Controller
             'matricula2'=> 'required',
             'correo'=> 'required',
             'numerocontacto'=> 'required',
-            'comprobantepago'=> 'required',
         ]);
-    
+        $alumno = Alumno::find($id);
+        $alumno->dni= $request->input('dni');
+        $alumno->apellidoynombre= $request->input('apellidoynombre');
+        $alumno->matricula= $request->input('matricula');
+        $alumno->matricula2= $request->input('matricula2');
+        $alumno->correo= $request->input('correo');
+        $alumno->numerocontacto= $request->input('numerocontacto');
+        $alumno->comprobantepago= $request->input('comprobantepago');
+
+        $alumno->save();
         $alumno->update($request->all());
     
         return redirect()->route('alumnos.index');
@@ -122,9 +134,9 @@ class AlumnoController extends Controller
      */
     public function destroy($id)
     {
-        //
-         $alumno->delete();
-    
+        
+         //
+          DB::table("alumnos")->where('id',$id)->delete();
         return redirect()->route('alumnos.index');
     }
 }

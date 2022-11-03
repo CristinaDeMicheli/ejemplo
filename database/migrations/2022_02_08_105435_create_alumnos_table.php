@@ -18,9 +18,9 @@ class CreateAlumnosTable extends Migration
             $table->integer('dni');
             $table->string('apellidoynombre');
             $table->integer('matricula');
-            $table->integer('matricula2');
+            $table->string('matricula2');
             $table->string('correo');
-            $table->integer('numerocontacto');
+            $table->string('numerocontacto');
             $table->string('comprobantepago');
             $table->timestamps();
         });

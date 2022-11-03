@@ -20,6 +20,8 @@ use App\Http\Controllers\InscripcioneController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+App::setLocale("es");
+
 
 Route::get('/', function () {
     return view('welcome');
